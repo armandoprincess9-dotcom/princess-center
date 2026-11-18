@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Princess Store - Agiza Juisi na Ubuyu</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2A1B3D;--mango:#FFB81C;--leaf:#1F7A4D;--bg:#FFFBEF;--card:#fff;--line:#EADFC4}
+@media(prefers-color-scheme:dark){:root{--ink:#F6EFE0;--bg:#1E1428;--card:#2A1B3D;--line:#4A3563;--leaf:#5BD08F}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Nunito,system-ui,sans-serif;padding-bottom:90px}
+h1,h2,.price{font-family:'Baloo 2',system-ui,sans-serif}
+header{background:var(--mango);color:#2A1B3D;padding:36px 20px 56px;text-align:center;border-radius:0 0 40px 40px}
+header h1{margin:0;font-size:clamp(30px,8vw,48px);line-height:1.05;font-weight:800}
+header p{margin:8px auto 0;max-width:420px}
+main{max-width:720px;margin:-28px auto 0;padding:0 16px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px}
+.tab{flex:none;border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 18px;font:700 15px Nunito,sans-serif;cursor:pointer}
+.tab[aria-selected=true]{background:var(--ink);color:var(--bg)}
+.banner{background:var(--ink);color:var(--bg);border-radius:16px;padding:12px 16px;margin-bottom:12px;font-weight:700}
+.empty{background:var(--card);border:2px dashed var(--line);border-radius:20px;padding:22px;text-align:center;margin-bottom:12px}
+.grid{display:grid;gap:12px}
+.item{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px}
+.dot{width:54px;height:54px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:28px;background:var(--mango)}
+.info{flex:1;min-width:0}.info b{display:block}
+.price{color:var(--leaf);font-size:18px;font-weight:600}
+.tag{font-size:13px;font-weight:700;color:var(--leaf)}
+.out{opacity:.55}.out .dot{filter:grayscale(1)}.out .tag{color:#C0392B}
+.qty{display:flex;align-items:center;gap:8px}
+.qty button{width:36px;height:36px;border-radius:50%;border:2px solid var(--ink);background:none;color:var(--ink);font-size:20px;font-weight:700;cursor:pointer}
+.qty span{min-width:20px;text-align:center;font-weight:700}
+form{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:20px;margin-top:24px;display:grid;gap:12px}
+h2{margin:0;font-size:22px}
+label{display:grid;gap:4px;font-weight:700;font-size:14px}
+input,textarea{font:inherit;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink)}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--mango);outline-offset:2px}
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pay label{border:2px solid var(--line);border-radius:14px;padding:12px;font-weight:700;cursor:pointer;display:flex;gap:8px;align-items:center}
+.pay label:has(input:checked){border-color:var(--leaf);background:color-mix(in srgb,var(--leaf) 12%,transparent)}
+.pay input{accent-color:var(--leaf)}
+#lipa{display:none;border-left:5px solid var(--mango);padding:10px 14px;background:var(--bg);border-radius:8px}
+#lipa.on{display:block}#lipa big{font:800 26px 'Baloo 2',sans-serif;letter-spacing:1px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--bg);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.bar b{font:800 22px 'Baloo 2',sans-serif}
+.go{background:var(--mango);color:#2A1B3D;border:0;border-radius:99px;padding:12px 22px;font:800 16px 'Baloo 2',sans-serif;cursor:pointer}
+.go:disabled{opacity:.5}
+a.go{display:inline-block;text-decoration:none}#ok .go{margin:4px}.tab:disabled{opacity:.4}
+#ok{display:none;text-align:center;padding:40px 16px}#ok.on{display:block}
+.note{font-size:13px;opacity:.75;text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="biz">Princess Store</h1>
+  <p>Chagua unachopenda, weka idadi, tuma oda. Tunakuletea ukiwa safi na baridi.</p>
+</header>
+<main id="app">
+  <div class="tabs" id="siku"></div>
+  <div id="tangazo"></div>
+  <div class="tabs" id="tabs" role="tablist"></div>
+  <div class="grid" id="list"><p class="note">Inapakia bidhaa…</p></div>
+
+  <form id="f">
+    <h2>Taarifa zako</h2>
+    <label>Jina<input name="jina" required autocomplete="name"></label>
+    <label>Namba ya simu<input name="simu" type="tel" required autocomplete="tel" placeholder="07xx xxx xxx"></label>
+    <label>Mahali pa kupelekewa<textarea name="anwani" rows="2" required placeholder="Mfano: Area D, karibu na…"></textarea></label>
+    <label id="tarL" style="display:none">Siku ya kupelekewa<input name="tarehe" type="date"></label>
+    <label id="saaL" style="display:none">Saa ya kupelekewa (hiari)<input name="saa" type="time"></label>
+    <h2>Njia ya malipo</h2>
+    <div class="pay">
+      <label><input type="radio" name="malipo" value="Cash" checked> Cash (kulipa ukipokea)</label>
+      <label><input type="radio" name="malipo" value="Lipa Namba"> Lipa Namba</label>
+    </div>
+    <div id="lipa">
+      <p style="margin:0">Hii ni <b>Lipa Namba ya Airtel</b>, lakini unaweza kulipa kutoka mtandao wowote: <b id="mitandao"></b></p>
+      <big id="namba"></big>
+      <p style="margin:0">Jina: <b id="lname"></b></p>
+      <p style="margin:6px 0 0;font-size:14px">Baada ya kulipa, andika jina lako la malipo hapa chini ili tukuthibitishie.</p>
+      <label style="margin-top:8px">Namba/jina lililotumika kulipa<input name="ref"></label>
+    </div>
+  </form>
+  <p class="note">Oda yako inatufikia moja kwa moja WhatsApp.</p>
+  <div id="ok"><div style="font-size:56px">🎉</div><h2>Asante! Oda yako imepokelewa</h2><p>Tutakupigia au kukutumia ujumbe WhatsApp kuthibitisha.</p><a class="go" id="wa" target="_blank" rel="noopener">Wasiliana nasi WhatsApp</a><button class="go" onclick="location.reload()">Agiza tena</button></div>
+</main>
+
+<div class="bar" id="bar">
+  <div><small>Jumla</small><br><b id="total">TSh 0</b></div>
+  <button class="go" id="send" disabled>Tuma oda</button>
+</div>
+
+<script>
+/* ===== MIPANGILIO: BADILISHA HAPA TU ===== */
+const CONFIG = {
+  jinaBiashara: "Princess Store",
+  saaKufunga: 17,   // saa 24 (17 = saa 11 jioni); Sheet ikiwa na Mipangilio B3 inatumika hiyo
+  whatsapp: "",     // Sheet Mipangilio B2 inatumika kwanza
+  scriptUrl: "https://script.google.com/macros/s/AKfycbyJ5aEHQ1Kspqu_r4An31_lTnYUPPnUIymLK9hXoaJo0BrMapWFpn-6phlgQYhCKYjK/exec",                 // URL ya Google Apps Script
+  lipaNamba: "139116901",
+  lipaJina: "AGNESS GABRIEL TELEKA",
+  mitandao: "M-Pesa, Tigo Pesa, Airtel Money au HaloPesa"
+};
+/* Mfano unaonekana kama scriptUrl haijawekwa */
+const DEMO = [
+  {kategoria:"Juisi",bidhaa:"Ubuyu wa Maembe (300ml)",bei:1500,kiasi:8},
+  {kategoria:"Juisi",bidhaa:"Ubuyu wa Kawaida (300ml)",bei:1000,kiasi:0},
+  {kategoria:"Ubuyu",bidhaa:"Ubuyu wa Rangi (kifuko)",bei:500,kiasi:20},
+  {kategoria:"Ubuyu",bidhaa:"Ubuyu wa Embe (kifuko)",bei:700,kiasi:12}
+];
+const $=s=>document.querySelector(s), fmt=n=>"TSh "+n.toLocaleString("en-US");
+let items=[], cart={}, cat="", tangazo="", siku="Leo";
+const has=i=>i.kiasi>0, avail=i=>siku==="Mapema"||has(i);
+const closed=()=>{const h=+new Intl.DateTimeFormat("en-GB",{hour:"2-digit",hour12:false,timeZone:"Africa/Dar_es_Salaam"}).format(new Date());return h>=+CONFIG.saaKufunga};
+const ICON=n=>/embe/i.test(n)?"🥭":/ml|juisi/i.test(n)?"🍹":"🍬";
+
+$("#biz").textContent=CONFIG.jinaBiashara;
+$("#namba").textContent=CONFIG.lipaNamba;$("#lname").textContent=CONFIG.lipaJina;$("#mitandao").textContent=CONFIG.mitandao;
+
+async function load(){
+  try{
+    if(!CONFIG.scriptUrl) throw 0;
+    const r=await fetch(CONFIG.scriptUrl); const j=await r.json(); items=j.bidhaa; tangazo=j.tangazo||"";
+    if(j.saaKufunga!==""&&j.saaKufunga!=null) CONFIG.saaKufunga=+j.saaKufunga;
+    if(j.whatsapp) CONFIG.whatsapp=String(j.whatsapp);
+  }catch(e){items=DEMO;tangazo="Mfano: Leo tuna Ubuyu wa Maembe tu. Oda hadi saa 10 jioni."}
+  cat=items[0]?.kategoria; if(closed()) siku="Mapema"; draw();
+}
+function draw(){
+  const cl=closed();
+  $("#siku").innerHTML=["Leo","Mapema"].map(s=>`<button class="tab sk" data-s="${s}" aria-selected="${s===siku}" ${s==="Leo"&&cl?"disabled":""}>${s==="Leo"?"Oda ya leo":"Oda ya mapema"}</button>`).join("");
+  $("#saaL").style.display=$("#tarL").style.display=siku==="Mapema"?"grid":"none";
+  const T=document.querySelector("[name=tarehe]"),ymd=o=>new Intl.DateTimeFormat("en-CA",{timeZone:"Africa/Dar_es_Salaam"}).format(new Date(Date.now()+o*864e5));
+  T.required=siku==="Mapema";T.min=ymd(1);T.max=ymd(14);
+  const cats=[...new Set(items.map(i=>i.kategoria))];
+  $("#tabs").innerHTML=cats.map(c=>`<button class="tab" role="tab" aria-selected="${c===cat}" data-c="${c}">${c}</button>`).join("");
+  $("#tangazo").innerHTML=(cl?`<div class="banner">⏰ Oda za leo zimefungwa (saa ${CONFIG.saaKufunga}:00). Chagua siku ya kupelekewa.</div>`:"")+(tangazo?`<div class="banner">📢 ${tangazo}</div>`:"");
+  const L=items.filter(i=>i.kategoria===cat);
+  if(!items.length){$("#list").innerHTML=`<div class="empty"><b>Leo bado hatujaweka bidhaa 😔</b><br>Rudi baadaye kidogo au kesho.</div>`;return sum()}
+  $("#list").innerHTML=(L.length&&!L.some(avail)?`<div class="empty"><b>${cat} za leo zimeisha 😔</b><br>Rudi kesho.</div>`:"")+L.map(i=>{
+    const ok=avail(i), n=cart[i.bidhaa]||0;
+    return `<div class="item ${ok?"":"out"}"><div class="dot">${ICON(i.bidhaa)}</div>
+    <div class="info"><b>${i.bidhaa}</b><span class="price">${fmt(+i.bei)}</span><br>${ok?`<span class="tag">${siku==="Leo"?"Zimebaki "+i.kiasi:"Oda ya mapema"}</span>`:`<span class="tag">Imeisha</span>`}</div>
+    ${ok?`<div class="qty"><button data-k="${i.bidhaa}" data-d="-1" aria-label="Punguza">−</button><span>${n}</span><button data-k="${i.bidhaa}" data-d="1" aria-label="Ongeza">+</button></div>`:""}</div>`}).join("");
+  sum();
+}
+function sum(){
+  const t=items.reduce((a,i)=>a+(cart[i.bidhaa]||0)*i.bei,0);
+  $("#total").textContent=fmt(t); $("#send").disabled=!t;
+}
+document.addEventListener("click",e=>{
+  const sk=e.target.closest("[data-s]"); if(sk&&!sk.disabled){siku=sk.dataset.s;cart={};draw();return}
+  const t=e.target.closest("[data-c]"); if(t){cat=t.dataset.c;draw()}
+  const b=e.target.closest("[data-k]"); if(b){const k=b.dataset.k,it=items.find(x=>x.bidhaa===k);cart[k]=Math.min(siku==="Mapema"?20:it.kiasi,Math.max(0,(cart[k]||0)+ +b.dataset.d));draw()}
+});
+document.querySelectorAll("[name=malipo]").forEach(r=>r.onchange=()=>$("#lipa").classList.toggle("on",r.value==="Lipa Namba"&&r.checked));
+
+$("#send").onclick=async()=>{
+  const f=$("#f"); if(!f.reportValidity()) return;
+  const d=Object.fromEntries(new FormData(f));
+  const lines=items.filter(i=>cart[i.bidhaa]).map(i=>({kategoria:i.kategoria,bidhaa:i.bidhaa,idadi:cart[i.bidhaa],bei:i.bei,jumla:cart[i.bidhaa]*i.bei}));
+  const jumla=lines.reduce((a,l)=>a+l.jumla,0);
+  const oda={...d,siku,mistari:lines,jumla};
+  try{localStorage.setItem("ps_cust",JSON.stringify({jina:d.jina,simu:d.simu,anwani:d.anwani}))}catch(e){}
+  $("#send").disabled=true;$("#send").textContent="Inatuma…";
+  try{
+    if(CONFIG.scriptUrl) await fetch(CONFIG.scriptUrl,{method:"POST",mode:"no-cors",body:JSON.stringify(oda)});
+    else console.log("ODA (hakuna scriptUrl):",oda);
+    const num=String(CONFIG.whatsapp||"").replace(/\D/g,""), wa=$("#wa");
+    if(num) wa.href="https://wa.me/"+num+"?text="+encodeURIComponent("Habari Princess Store, nimetuma oda ("+(siku==="Mapema"?d.tarehe:"Leo")+"):\n"+lines.map(l=>"• "+l.bidhaa+" x"+l.idadi).join("\n")+"\nJumla: "+fmt(jumla)+"\nJina: "+d.jina);
+    else wa.style.display="none";
+    $("#app").querySelectorAll(".tabs,.grid,form,.note,#tangazo").forEach(x=>x.style.display="none");
+    $("#bar").style.display="none";$("#ok").classList.add("on");scrollTo(0,0);
+  }catch(e){alert("Imeshindwa kutuma. Jaribu tena.");$("#send").disabled=false;$("#send").textContent="Tuma oda"}
+};
+try{const c=JSON.parse(localStorage.getItem("ps_cust")||"null");if(c)for(const k in c){const el=document.querySelector("[name="+k+"]");if(el)el.value=c[k]}}catch(e){}
+load();
+</script>
+</body>
+</html>
